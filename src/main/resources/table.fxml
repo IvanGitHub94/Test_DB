@@ -1,28 +1,25 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.scene.control.Button?>
-<?import javafx.scene.control.TableColumn?>
-<?import javafx.scene.control.TableView?>
-<?import javafx.scene.control.TextField?>
-<?import javafx.scene.layout.AnchorPane?>
-<?import javafx.scene.text.Font?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
 
-<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="420.0" prefWidth="520.0" style="-fx-background-color: #2E4348;" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="sample.TableController">
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="420.0" prefWidth="520.0" style="-fx-background-color: #2E4348;" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="sample.TableController">
    <children>
       <TableView fx:id="tblPersons" editable="true" layoutX="10.0" layoutY="14.0" prefHeight="340.0" prefWidth="500.0">
         <columns>
-          <TableColumn fx:id="columnName" editable="false" prefWidth="249.0" resizable="false" sortable="false" text="1" />
-          <TableColumn fx:id="columnLastName" editable="false" prefWidth="249.0" resizable="false" sortable="false" text="2" />
+          <TableColumn fx:id="columnName" prefWidth="249.0" resizable="false" sortable="false" text="1" />
+          <TableColumn fx:id="columnLastName" prefWidth="249.0" resizable="false" sortable="false" text="2" />
         </columns>
       </TableView>
       <TextField fx:id="fieldName" layoutX="10.0" layoutY="375.0" prefHeight="25.0" prefWidth="120.0" promptText="Name" />
       <TextField fx:id="fieldLastName" layoutX="140.0" layoutY="375.0" prefHeight="25.0" prefWidth="120.0" promptText="Last name" />
-      <Button fx:id="btnDel" alignment="CENTER" layoutX="438.0" layoutY="364.0" mnemonicParsing="false" prefHeight="46.0" prefWidth="72.0" text="DEL">
+      <Button fx:id="btnDel" onAction="#delete" alignment="CENTER" layoutX="438.0" layoutY="364.0" mnemonicParsing="false" prefHeight="46.0" prefWidth="72.0" text="DEL">
          <font>
             <Font name="Arial" size="14.0" />
          </font>
       </Button>
-      <Button fx:id="btnEdit" alignment="CENTER" layoutX="355.0" layoutY="364.0" mnemonicParsing="false" prefHeight="46.0" prefWidth="72.0" text="EDIT">
+      <Button fx:id="btnEdit" alignment="CENTER" layoutX="355.0" layoutY="364.0" mnemonicParsing="false" onAction="#editRecord" prefHeight="46.0" prefWidth="72.0" text="EDIT">
          <font>
             <Font size="14.0" />
          </font>

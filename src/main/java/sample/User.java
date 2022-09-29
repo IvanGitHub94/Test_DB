@@ -1,14 +1,20 @@
 package sample;
 
+import lombok.Getter;
+
+import java.time.LocalDateTime;
 import java.util.GregorianCalendar;
 
 public class User {
     private String login, pass;
+    @Getter
+    private LocalDateTime registrationTime;
     //private GregorianCalendar date;
 
     public User( String login, String pass) {
         this.login = login;
         this.pass = pass;
+        this.registrationTime = LocalDateTime.now();
        // date = new GregorianCalendar();
     }
 

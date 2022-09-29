@@ -4,16 +4,17 @@ import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.PrintWriter;
 import java.nio.file.Path;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
+
+import static sample.FileService.createDir;
+import static sample.FileService.createFile;
 
 public class FileManagerMock_1 implements IFileManager{
 
     private  List<User> users;
 
     public FileManagerMock_1() {
-        users = CreatorList.usersFromFile(CreatorList.createFileOfUsers(CreatorList.createDir()));
+        users = CreatorList.usersFromFile(createFile(createDir("/.test"), "fromCode.txt"));
         /*users = new ArrayList<User>();
         users.add( new User("admin", "12345"));
         users.add( new User("user", "1111"));*/

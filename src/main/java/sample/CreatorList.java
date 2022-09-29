@@ -9,7 +9,7 @@ import java.util.List;
 
 public class CreatorList {
 
-    public static String createDir() {
+/*    public static String createDir() {
         // создание директории .test в корне папки пользователя (если такой еще нет)
         String dir = System.getProperty("user.home");
         Path path = Paths.get(dir + "/.test");
@@ -33,7 +33,7 @@ public class CreatorList {
             e.printStackTrace();
         }
         return usersFile;
-    }
+    }*/
 
     public static List<User> usersFromFile(Path path) {
 

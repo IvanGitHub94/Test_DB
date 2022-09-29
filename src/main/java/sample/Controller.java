@@ -17,6 +17,8 @@ import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 import javafx.stage.Stage;
 
+import static sample.FileService.writeToFile;
+
 public class Controller {
 
     private UserRepository_1 repository;
@@ -57,6 +59,10 @@ public class Controller {
 
             if (!login.equals("") && !password.equals("")) {
                     if (loginUser(login, password)) {
+                        //TODO: create user service and provide active user to file service in a more civil way
+                        User currentUser = repository.getByLoginAndPass(login, password).get();
+                        FileService.setCurrentUser(currentUser);
+
                         signInButton.getScene().getWindow().hide();
                         FXMLLoader loader = new FXMLLoader();
                         loader.setLocation(getClass().getResource("/table.fxml"));
@@ -72,6 +78,7 @@ public class Controller {
                         stage.setResizable(false);
                         stage.setTitle("DB Table");
                         stage.showAndWait();
+                        stage.setOnHiding(e -> writeToFile());
                     }
                     else {
                         labelAlert.setText("Неправильный логин или пароль.");
