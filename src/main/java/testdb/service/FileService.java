@@ -1,6 +1,7 @@
-package sample;
+package testdb.service;
 
 import lombok.Setter;
+import testdb.model.User;
 
 import java.io.IOException;
 import java.nio.file.Files;

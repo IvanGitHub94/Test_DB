@@ -1,15 +1,18 @@
-package sample;
-
-import java.net.URL;
-import java.util.ResourceBundle;
+package testdb.controller;
 
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.scene.control.*;
+import javafx.scene.control.Button;
+import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableView;
+import javafx.scene.control.TextField;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.control.cell.TextFieldTableCell;
+
+import java.net.URL;
+import java.util.ResourceBundle;
 
 public class TableController {
 
@@ -47,10 +50,9 @@ public class TableController {
 
     public void editRecord() {
         int selectedNumberRow = tblPersons.getSelectionModel().getFocusedIndex();
-        tblPersons.getSelectionModel().select(selectedNumberRow);
-        tblPersons.getFocusModel().focus(selectedNumberRow + 1);
-//        tblPersons.edit(selectedNumberRow, columnName);
-//        tblPersons.edit(selectedNumberRow, columnLastName);
+/*        tblPersons.getSelectionModel().select(selectedNumberRow);
+        tblPersons.getFocusModel().focus(selectedNumberRow);*/
+        tblPersons.edit(selectedNumberRow, columnName);
     }
 
     public void delete() {
@@ -107,11 +109,19 @@ public class TableController {
                 System.out.println("Поля не могут быть пустыми."); // заглушка - исправить
             }else{
                 people.add(new ModelPerson_1(
-                            fieldName.getText(),
-                            fieldLastName.getText()
+                                fieldName.getText(),
+                                fieldLastName.getText()
                         )
                 );
             }
+        });
+        columnName.setCellFactory(TextFieldTableCell.forTableColumn());
+        columnName.setOnEditCommit(event -> {
+            event.getRowValue().setName(event.getNewValue());
+        });
+        columnLastName.setCellFactory(TextFieldTableCell.forTableColumn());
+        columnLastName.setOnEditCommit(event -> {
+            event.getRowValue().setCountry(event.getNewValue());
         });
     }
 }

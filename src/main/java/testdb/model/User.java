@@ -1,21 +1,22 @@
-package sample;
+package testdb.model;
 
 import lombok.Getter;
 
 import java.time.LocalDateTime;
-import java.util.GregorianCalendar;
+import java.time.format.DateTimeFormatter;
 
 public class User {
     private String login, pass;
     @Getter
-    private LocalDateTime registrationTime;
+    private String registrationTime;
     //private GregorianCalendar date;
 
     public User( String login, String pass) {
         this.login = login;
         this.pass = pass;
-        this.registrationTime = LocalDateTime.now();
-       // date = new GregorianCalendar();
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd_HH-mm-ss");
+        this.registrationTime = LocalDateTime.now().format(formatter);
+        // date = new GregorianCalendar();
     }
 
     public String getLogin() {
@@ -36,12 +37,6 @@ public class User {
 
     public String toDataBaseLine(){
         return String.format("%s:::%s",login, pass);
-    }
-
-
-    static User fromDataBaseLine(String str){
-        String[] vars = str.split(":::");
-        return  new User(vars[0], vars[1]);
     }
 
     @Override
