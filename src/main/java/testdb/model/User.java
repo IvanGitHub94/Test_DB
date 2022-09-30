@@ -1,17 +1,22 @@
 package testdb.model;
 
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
+import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
-public class User {
+@NoArgsConstructor
+@AllArgsConstructor
+public class User implements Serializable {
     private String login, pass;
     @Getter
     private String registrationTime;
     //private GregorianCalendar date;
 
-    public User( String login, String pass) {
+    public User(String login, String pass) {
         this.login = login;
         this.pass = pass;
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd_HH-mm-ss");

@@ -19,6 +19,7 @@ import java.io.IOException;
 import java.net.URL;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.ResourceBundle;
@@ -29,12 +30,12 @@ public class StartController {
 
     private final UserService userService = new UserFileService();
     private final UserRepository userRepository = new UserRepository();
-    List<User> availableUsers;
+    private List<User> availableUsers = new ArrayList<>();
     User currentUser;
 
 
     public StartController() {
-        availableUsers = userService.read(createFile(createDir("/.test"), "fromCode.txt"));
+        availableUsers = userService.read(createFileIfNotExists(createDir("/.test"), "fromCode.json"));
     }
 
     @FXML
@@ -105,7 +106,7 @@ public class StartController {
                 labelAlert.setText("Регистрация завершена.");
                 availableUsers.add(user);
 
-                Path path = Paths.get(System.getProperty("user.home") + "/.test" + "/fromCode.txt");
+                Path path = Paths.get(System.getProperty("user.home") + "/.test" + "/fromCode.json");
 
                 saveAll(availableUsers, path);
 

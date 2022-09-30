@@ -15,7 +15,8 @@ public class FileService {
 
     public static void writeToFile() {
         String dir = createDir("/.test/users_data");
-        createFile(dir, currentUser.getLogin() + "_" + currentUser.getRegistrationTime() + ".json");
+        Path fileToWrite = createFileIfNotExists(dir, currentUser.getLogin() + "_" + currentUser.getRegistrationTime() + ".json");
+
     };
 
     public static String createDir(String pathInsideUserDir) {
@@ -31,7 +32,7 @@ public class FileService {
         return path.toString();
     }
 
-    public static Path createFile(String pathDir, String filename) {
+    public static Path createFileIfNotExists(String pathDir, String filename) {
         // создание файла .txt (если такого еще нет)
         Path usersFile = Paths.get(pathDir + "/" + filename);
         try {
