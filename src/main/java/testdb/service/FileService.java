@@ -15,19 +15,16 @@ public class FileService {
 
     public static String createDir(String pathInsideUserDir) {
         // создание директории .test в корне папки пользователя (если такой еще нет)
-        //String dir = System.getProperty("user.home");
         Path path = Paths.get(System.getProperty("user.home") + pathInsideUserDir);
         try {
             Files.createDirectories(path);
-            System.out.println("Directory created!");
         } catch (IOException e) {
-            System.err.println("Failed to create directory!" + e.getMessage()); //!!! исправить sout
         }
         return path.toString();
     }
 
     public static Path createFileIfNotExists(String pathDir, String filename) {
-        // создание файла .txt (если такого еще нет)
+        // создание файла (если такого еще нет)
         Path usersFile = Paths.get(pathDir, filename);
         try {
             if (!Files.exists(usersFile)) {

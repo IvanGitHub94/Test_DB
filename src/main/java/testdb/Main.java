@@ -5,6 +5,7 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
+import testdb.service.FileService;
 
 import java.util.Objects;
 
@@ -14,6 +15,11 @@ public class Main extends Application {
 
     @Override
     public void start(Stage primaryStage) throws Exception {
+        ///////////////////////////////////////////////////////TODO: вынести создание файла и директорий из мэйна
+            FileService.createFileIfNotExists(FileService.createDir("/.test"), "/fromCode.json");
+            FileService.createDir("/.test/users_data");
+        ///////////////////////////////////////////////////////
+
         Parent root = FXMLLoader.load(Objects.requireNonNull(getClass().getResource("/start-window.fxml")));
         primaryStage.setTitle("TestApp");
         primaryStage.setScene(new Scene(root, 220, 320));

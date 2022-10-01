@@ -1,5 +1,6 @@
 package testdb.controller;
 
+import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
@@ -20,14 +21,14 @@ import java.util.List;
 import static testdb.service.FileService.createDir;
 import static testdb.service.FileService.createFileIfNotExists;
 
-public class TableController {
+public class TableController implements Runnable{
 
 
     private static TableRecordService tableRecordService = new TableRecordService();
     private static ObservableList<TableRecord> userRecordings;
 
     @FXML
-    public ProgressBar progressBar;
+    public ProgressIndicator progressIndicator;
 
     @FXML
     private ResourceBundle resources;
@@ -43,6 +44,9 @@ public class TableController {
 
     @FXML
     private Button btnEdit;
+
+    @FXML
+    private Label tblAlert;
 
     @FXML
     private TextField fieldLastName;
@@ -74,7 +78,7 @@ public class TableController {
     @FXML
     private void add() {
         if (fieldName.getText().isEmpty() || fieldLastName.getText().isEmpty()) {
-            System.out.println("Поля не могут быть пустыми."); // заглушка - исправить
+            tblAlert.setText("Поля не могут быть пустыми.");
         } else {
             userRecordings.add(new TableRecord(
                             fieldName.getText(),
@@ -84,16 +88,13 @@ public class TableController {
         }
     }
 
+    @Override
+    public void run() {
+        progressIndicator.setVisible(true);
 
-    @SneakyThrows
-    @FXML
-    void initialize() {
-
+        ///////////////////////
         User activeUser = UserService.getActiveUser();
 
-        progressBar.setVisible(true);
-        Thread.sleep(2000);
-        progressBar.setVisible(false);
         userRecordings = createItems(tableRecordService.findAllUserRecordings(activeUser));
 
         tblPersons.setItems(userRecordings);
@@ -109,6 +110,39 @@ public class TableController {
         secondPropertyColumn.setOnEditCommit(event -> {
             event.getRowValue().setSecondProperty(event.getNewValue());
         });
+        ///////////////////////
+
+        Platform.runLater(() -> {
+            progressIndicator.setVisible(false);
+        });
+    }
+
+    @SneakyThrows
+    @FXML
+    void initialize() {
+        new Thread(this).start();
+
+        //TODO: код в комменте перенесен в run
+        /*User activeUser = UserService.getActiveUser();
+
+        *//*progressBar.setVisible(true);
+        Thread.sleep(2000);
+        progressBar.setVisible(false);*//*
+        userRecordings = createItems(tableRecordService.findAllUserRecordings(activeUser));
+
+        tblPersons.setItems(userRecordings);
+
+        firstPropertyColumn.setCellValueFactory(new PropertyValueFactory<TableRecord, String>("firstProperty"));
+        secondPropertyColumn.setCellValueFactory(new PropertyValueFactory<TableRecord, String>("secondProperty"));
+
+        firstPropertyColumn.setCellFactory(TextFieldTableCell.forTableColumn());
+        firstPropertyColumn.setOnEditCommit(event -> {
+            event.getRowValue().setFirstProperty(event.getNewValue());
+        });
+        secondPropertyColumn.setCellFactory(TextFieldTableCell.forTableColumn());
+        secondPropertyColumn.setOnEditCommit(event -> {
+            event.getRowValue().setSecondProperty(event.getNewValue());
+        });*/
     }
 
     private ObservableList<TableRecord> createItems(List<TableRecord> records) {
@@ -119,10 +153,13 @@ public class TableController {
 
     public static void writeToFile() {
         User currentUser = UserService.getActiveUser();
-        String dir = createDir("/.test/users_data");
-        Path fileToWrite = createFileIfNotExists(dir, currentUser.getLogin() + "_" + currentUser.getRegistrationTime() + ".json");
-        tableRecordService.saveAllUserRecords(currentUser, userRecordings);
 
+        //Добавлен if на случай, если стартовое окно будет закрыто без каких-либо действий
+        if (currentUser != null) {
+            String dir = createDir("/.test/users_data");
+            Path fileToWrite = createFileIfNotExists(dir, currentUser.getLogin() + "_" + currentUser.getRegistrationTime() + ".json");
+            tableRecordService.saveAllUserRecords(currentUser, userRecordings);
+        }
     }
 }
 
