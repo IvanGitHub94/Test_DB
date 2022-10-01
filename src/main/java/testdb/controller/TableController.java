@@ -1,22 +1,33 @@
 package testdb.controller;
 
-import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
-import javafx.scene.control.Button;
-import javafx.scene.control.TableColumn;
-import javafx.scene.control.TableView;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.control.cell.TextFieldTableCell;
+import lombok.SneakyThrows;
+import testdb.model.TableRecord;
+import testdb.model.User;
+import testdb.service.TableRecordService;
+import testdb.service.UserService;
 
 import java.net.URL;
+import java.nio.file.Path;
 import java.util.ResourceBundle;
+import java.util.List;
+
+import static testdb.service.FileService.createDir;
+import static testdb.service.FileService.createFileIfNotExists;
 
 public class TableController {
 
-    static ObservableList<ModelPerson_1> people;
+
+    private static TableRecordService tableRecordService = new TableRecordService();
+    private static ObservableList<TableRecord> userRecordings;
+
+    @FXML
+    public ProgressBar progressBar;
 
     @FXML
     private ResourceBundle resources;
@@ -40,89 +51,78 @@ public class TableController {
     private TextField fieldName;
 
     @FXML
-    private TableColumn<ModelPerson_1, String> columnLastName;
+    private TableColumn<TableRecord, String> secondPropertyColumn;
 
     @FXML
-    private TableColumn<ModelPerson_1, String> columnName;
+    private TableColumn<TableRecord, String> firstPropertyColumn;
 
     @FXML
-    private TableView<ModelPerson_1> tblPersons;
+    private TableView<TableRecord> tblPersons;
 
-    public void editRecord() {
+    @FXML
+    private void editRecord() {
         int selectedNumberRow = tblPersons.getSelectionModel().getFocusedIndex();
-/*        tblPersons.getSelectionModel().select(selectedNumberRow);
-        tblPersons.getFocusModel().focus(selectedNumberRow);*/
-        tblPersons.edit(selectedNumberRow, columnName);
+        tblPersons.edit(selectedNumberRow, firstPropertyColumn);
     }
 
-    public void delete() {
+    @FXML
+    private void delete() {
         int selectedNumberRow = tblPersons.getSelectionModel().getFocusedIndex();
-        people.remove(selectedNumberRow, selectedNumberRow + 1);
+        tableRecordService.deleteRecord(userRecordings, selectedNumberRow);
     }
 
-
-    public static class ModelPerson_1{
-
-        private final SimpleStringProperty name;
-        private final SimpleStringProperty lastName;
-
-        private ModelPerson_1(String strName, String strLastName) {
-            this.name = new SimpleStringProperty(strName);
-            this.lastName = new SimpleStringProperty(strLastName);
-
-        }
-
-        public String getName() {
-            return name.get();
-        }
-
-        public String getLastName() {
-            return lastName.get();
-        }
-
-        public void setName(String strName) {
-            name.set(strName);
-        }
-
-        public void setCountry(String strLastName) {
-            lastName.set(strLastName);
+    @FXML
+    private void add() {
+        if (fieldName.getText().isEmpty() || fieldLastName.getText().isEmpty()) {
+            System.out.println("Поля не могут быть пустыми."); // заглушка - исправить
+        } else {
+            userRecordings.add(new TableRecord(
+                            fieldName.getText(),
+                            fieldLastName.getText()
+                    )
+            );
         }
     }
 
 
+    @SneakyThrows
     @FXML
     void initialize() {
-        people = FXCollections.observableArrayList(
-                new ModelPerson_1("Ivan", "Smirnov"),
-                new ModelPerson_1("Petr", "Alekseev"),
-                new ModelPerson_1("Egor", "Volkov")
-        );
-        tblPersons.setItems(people);
 
-        // наполнение колонок
-        columnName.setCellValueFactory(new PropertyValueFactory<ModelPerson_1, String>("name"));
-        columnLastName.setCellValueFactory(new PropertyValueFactory<ModelPerson_1, String>("lastName"));
+        User activeUser = UserService.getActiveUser();
 
-        //////////////////////////////test
-        btnAdd.setOnAction(event -> {
-            if(fieldName.getText().isEmpty() || fieldLastName.getText().isEmpty() ) {
-                System.out.println("Поля не могут быть пустыми."); // заглушка - исправить
-            }else{
-                people.add(new ModelPerson_1(
-                                fieldName.getText(),
-                                fieldLastName.getText()
-                        )
-                );
-            }
+        progressBar.setVisible(true);
+        Thread.sleep(2000);
+        progressBar.setVisible(false);
+        userRecordings = createItems(tableRecordService.findAllUserRecordings(activeUser));
+
+        tblPersons.setItems(userRecordings);
+
+        firstPropertyColumn.setCellValueFactory(new PropertyValueFactory<TableRecord, String>("firstProperty"));
+        secondPropertyColumn.setCellValueFactory(new PropertyValueFactory<TableRecord, String>("secondProperty"));
+
+        firstPropertyColumn.setCellFactory(TextFieldTableCell.forTableColumn());
+        firstPropertyColumn.setOnEditCommit(event -> {
+            event.getRowValue().setFirstProperty(event.getNewValue());
         });
-        columnName.setCellFactory(TextFieldTableCell.forTableColumn());
-        columnName.setOnEditCommit(event -> {
-            event.getRowValue().setName(event.getNewValue());
+        secondPropertyColumn.setCellFactory(TextFieldTableCell.forTableColumn());
+        secondPropertyColumn.setOnEditCommit(event -> {
+            event.getRowValue().setSecondProperty(event.getNewValue());
         });
-        columnLastName.setCellFactory(TextFieldTableCell.forTableColumn());
-        columnLastName.setOnEditCommit(event -> {
-            event.getRowValue().setCountry(event.getNewValue());
-        });
+    }
+
+    private ObservableList<TableRecord> createItems(List<TableRecord> records) {
+        ObservableList items = FXCollections.observableArrayList();
+        items.addAll(records);
+        return items;
+    }
+
+    public static void writeToFile() {
+        User currentUser = UserService.getActiveUser();
+        String dir = createDir("/.test/users_data");
+        Path fileToWrite = createFileIfNotExists(dir, currentUser.getLogin() + "_" + currentUser.getRegistrationTime() + ".json");
+        tableRecordService.saveAllUserRecords(currentUser, userRecordings);
+
     }
 }
 

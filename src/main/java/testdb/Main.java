@@ -8,7 +8,7 @@ import javafx.stage.Stage;
 
 import java.util.Objects;
 
-import static testdb.service.FileService.writeToFile;
+import static testdb.controller.TableController.writeToFile;
 
 public class Main extends Application {
 

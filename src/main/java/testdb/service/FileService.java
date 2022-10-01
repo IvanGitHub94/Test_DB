@@ -1,8 +1,8 @@
 package testdb.service;
-
 import lombok.Setter;
 import testdb.model.User;
 
+import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -13,16 +13,10 @@ public class FileService {
     @Setter
     private static User currentUser;
 
-    public static void writeToFile() {
-        String dir = createDir("/.test/users_data");
-        Path fileToWrite = createFileIfNotExists(dir, currentUser.getLogin() + "_" + currentUser.getRegistrationTime() + ".json");
-
-    };
-
     public static String createDir(String pathInsideUserDir) {
         // создание директории .test в корне папки пользователя (если такой еще нет)
-        String dir = System.getProperty("user.home");
-        Path path = Paths.get(dir + pathInsideUserDir);
+        //String dir = System.getProperty("user.home");
+        Path path = Paths.get(System.getProperty("user.home") + pathInsideUserDir);
         try {
             Files.createDirectories(path);
             System.out.println("Directory created!");
@@ -34,10 +28,15 @@ public class FileService {
 
     public static Path createFileIfNotExists(String pathDir, String filename) {
         // создание файла .txt (если такого еще нет)
-        Path usersFile = Paths.get(pathDir + "/" + filename);
+        Path usersFile = Paths.get(pathDir, filename);
         try {
             if (!Files.exists(usersFile)) {
                 Files.createFile(usersFile);
+                //
+                    try (FileWriter file = new FileWriter(String.valueOf(usersFile))) {
+                        file.write("[]");
+                    }
+                //
             }
         } catch (IOException e) {
             e.printStackTrace();

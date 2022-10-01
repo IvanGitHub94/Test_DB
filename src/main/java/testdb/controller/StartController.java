@@ -10,33 +10,22 @@ import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 import javafx.stage.Stage;
 import testdb.model.User;
-import testdb.repository.UserRepository;
 import testdb.service.FileService;
-import testdb.service.UserFileService;
 import testdb.service.UserService;
 
 import java.io.IOException;
 import java.net.URL;
+import java.nio.file.CopyOption;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
 import java.util.ResourceBundle;
 
-import static testdb.service.FileService.*;
+import static java.nio.file.StandardCopyOption.REPLACE_EXISTING;
 
 public class StartController {
 
-    private final UserService userService = new UserFileService();
-    private final UserRepository userRepository = new UserRepository();
-    private List<User> availableUsers = new ArrayList<>();
-    User currentUser;
-
-
-    public StartController() {
-        availableUsers = userService.read(createFileIfNotExists(createDir("/.test"), "fromCode.json"));
-    }
+    private UserService userService = new UserService();
 
     @FXML
     private ResourceBundle resources;
@@ -56,6 +45,23 @@ public class StartController {
     @FXML
     private Label labelAlert;
 
+    @FXML
+    public void initialize() {
+        if (!userService.loginExists("user")) {
+            User userWithBigFile = new User("user", "123");
+            userService.addNewUser(userWithBigFile.getLogin(), userWithBigFile.getPass());
+            String userRecordingsFileName = userWithBigFile.getLogin() + "_" + userWithBigFile.getRegistrationTime() + ".json";
+            Path userRecordingsFilePath = FileService.createFileIfNotExists(Paths.get(System.getProperty("user.home"), ".test",  "users_data").toString(), userRecordingsFileName);
+            try {
+                Files.copy(Paths.get("src\\main\\resources\\fillTableFile.json"), userRecordingsFilePath, REPLACE_EXISTING);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+
+
+    }
+
 
     @FXML
     private void singIn(){
@@ -64,11 +70,8 @@ public class StartController {
         String password = passField.getText().trim();
 
         if (!login.equals("") && !password.equals("")) {
-            if (userExists(login, password)) {
-                //TODO: create user service and provide active user to file service in a more civil way
-
-                FileService.setCurrentUser(currentUser);
-
+            if (userService.userExists(login, password)) {
+                UserService.setActiveUser(userService.findByLoginAndPassword(login, password));
                 signInButton.getScene().getWindow().hide();
                 FXMLLoader loader = new FXMLLoader();
                 loader.setLocation(getClass().getResource("/table.fxml"));
@@ -84,7 +87,6 @@ public class StartController {
                 stage.setResizable(false);
                 stage.setTitle("DB Table");
                 stage.showAndWait();
-                stage.setOnHiding(e -> writeToFile());
             }
             else {
                 labelAlert.setText("Неправильный логин или пароль.");
@@ -101,15 +103,9 @@ public class StartController {
         String password = passField.getText().trim();
 
         if (!login.equals("") && !password.equals("")) {
-            if (!loginExists(login)) {
-                User user = new User(login, password);
+            if (!userService.loginExists(login)) {
                 labelAlert.setText("Регистрация завершена.");
-                availableUsers.add(user);
-
-                Path path = Paths.get(System.getProperty("user.home") + "/.test" + "/fromCode.json");
-
-                saveAll(availableUsers, path);
-
+                userService.addNewUser(login, password);
             }
             else {
                 labelAlert.setText("Такой пользователь уже есть.");
@@ -118,27 +114,6 @@ public class StartController {
         else {
             labelAlert.setText("Поля не могут быть пустыми.");
         }
-    }
-
-    private boolean userExists(String login, String password) {
-        Optional<User> matchingUser = availableUsers.stream()
-                .filter(user -> user.getLogin().equals(login) && user.getPass().equals(password))
-                .findFirst();
-       if (matchingUser.isPresent()) {
-           currentUser = matchingUser.get();
-           return true;
-       }
-       return false;
-    }
-
-    private boolean loginExists(String login) {
-        return availableUsers.stream()
-                .anyMatch(user -> user.getLogin().equals(login));
-
-    }
-
-    private void saveAll(List<User> users, Path path) {
-        userRepository.saveAll(users, path);
     }
 
 }

@@ -1,11 +1,15 @@
 package testdb.model;
 
+import lombok.AllArgsConstructor;
+import lombok.NoArgsConstructor;
+
+@NoArgsConstructor
 public class TableRecord {
 
     private String firstProperty;
     private String secondProperty;
 
-    private TableRecord(String strName, String strLastName) {
+    public TableRecord(String strName, String strLastName) {
         this.firstProperty = strName;
         this.secondProperty = strLastName;
 

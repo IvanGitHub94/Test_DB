@@ -9,7 +9,6 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
 @NoArgsConstructor
-@AllArgsConstructor
 public class User implements Serializable {
     private String login, pass;
     @Getter
