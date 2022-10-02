@@ -1,6 +1,5 @@
 package testdb.model;
 
-import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
 
 @NoArgsConstructor
