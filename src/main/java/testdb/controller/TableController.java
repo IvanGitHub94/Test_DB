@@ -72,8 +72,8 @@ public class TableController implements Runnable{
         if(tblPersons.getSelectionModel().isEmpty() /*||
                 (fieldName.getText().isEmpty() && fieldLastName.getText().isEmpty())*/ ) {
             tblAlert.setText("Выберите строку с данными."); // пока вопрос формулировки
-        }else if (fieldName.getText().isEmpty() || fieldLastName.getText().isEmpty() ) {
-            tblAlert.setText("Поля не могут быть пустыми.");
+        }else if (fieldName.getText().isEmpty() && fieldLastName.getText().isEmpty() ) {
+            tblAlert.setText("Измените минимум одно поле.");
         }else{
             String strName = userRecordings.get(tblPersons.getSelectionModel().getSelectedIndex()).getFirstProperty();
             String strLastName = userRecordings.get(tblPersons.getSelectionModel().getSelectedIndex()).getSecondProperty();
