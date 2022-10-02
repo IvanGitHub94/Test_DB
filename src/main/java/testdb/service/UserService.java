@@ -11,11 +11,9 @@ import java.util.Optional;
 
 public class UserService {
 
-    @Getter
-    List<User> availableUsers = new ArrayList<>();
+    private List<User> availableUsers = new ArrayList<>(); // решить делать ли приватным лист
     private UserRepository userRepository = new UserRepositoryFileImpl();
 
-    @Getter
     private static User activeUser;
 
     public UserService() {
@@ -24,7 +22,7 @@ public class UserService {
 
     public boolean loginExists(String login) {
         return availableUsers.stream()
-                .anyMatch(user -> user.getLogin().equals(login));
+                .anyMatch(user -> user.getLogin().equalsIgnoreCase(login)); // добавлено игнорирование регистра для логина
     }
 
     public void addNewUser(String login, String password) {
@@ -35,18 +33,26 @@ public class UserService {
 
     public boolean userExists(String login, String password) {
         Optional<User> matchingUser = availableUsers.stream()
-                .filter(user -> user.getLogin().equals(login) && user.getPass().equals(password))
+                .filter(user -> user.getLogin().equalsIgnoreCase(login) && user.getPass().equals(password)) // добавлено игнорирование регистра для логина
                 .findFirst();
         return matchingUser.isPresent();
     }
 
     public User findByLoginAndPassword(String login, String password) {
         return availableUsers.stream()
-                .filter(user -> user.getLogin().equals(login) && user.getPass().equals(password))
+                .filter(user -> user.getLogin().equalsIgnoreCase(login) && user.getPass().equals(password)) // добавлено игнорирование регистра для логина
                 .findFirst().get();
     }
 
     public static void setActiveUser(User user) {
         activeUser = user;
+    }
+
+    public List<User> getAvailableUsers() {
+        return availableUsers;
+    }
+
+    public static User getActiveUser() {
+        return activeUser;
     }
 }

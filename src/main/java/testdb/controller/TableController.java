@@ -65,8 +65,34 @@ public class TableController implements Runnable{
 
     @FXML
     private void editRecord() {
-        int selectedNumberRow = tblPersons.getSelectionModel().getFocusedIndex();
-        tblPersons.edit(selectedNumberRow, firstPropertyColumn);
+        /*int selectedNumberRow = tblPersons.getSelectionModel().getFocusedIndex();
+        tblPersons.edit(selectedNumberRow, firstPropertyColumn);*/
+
+        //// 02.10
+        if(tblPersons.getSelectionModel().isEmpty() /*||
+                (fieldName.getText().isEmpty() && fieldLastName.getText().isEmpty())*/ ) {
+            tblAlert.setText("Выберите строку с данными."); // пока вопрос формулировки
+        }else if (fieldName.getText().isEmpty() || fieldLastName.getText().isEmpty() ) {
+            tblAlert.setText("Поля не могут быть пустыми.");
+        }else{
+            String strName = userRecordings.get(tblPersons.getSelectionModel().getSelectedIndex()).getFirstProperty();
+            String strLastName = userRecordings.get(tblPersons.getSelectionModel().getSelectedIndex()).getSecondProperty();
+
+            if(!fieldName.getText().isEmpty()){
+                strName = fieldName.getText();
+            }
+            if(!fieldLastName.getText().isEmpty()){
+                strLastName = fieldLastName.getText();
+            }
+
+            userRecordings.set(tblPersons.getSelectionModel().getSelectedIndex(),
+                    new TableRecord(strName, strLastName));
+
+            fieldName.clear();
+            fieldLastName.clear();
+            tblAlert.setText("");
+        }
+
     }
 
     @FXML
