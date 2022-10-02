@@ -73,7 +73,7 @@ public class TableController implements Runnable{
                 (fieldName.getText().isEmpty() && fieldLastName.getText().isEmpty())*/ ) {
             tblAlert.setText("Выберите строку с данными."); // пока вопрос формулировки
         }else if (fieldName.getText().isEmpty() && fieldLastName.getText().isEmpty() ) {
-            tblAlert.setText("Измените минимум одно поле.");
+            tblAlert.setText("Введите данные.");
         }else{
             String strName = userRecordings.get(tblPersons.getSelectionModel().getSelectedIndex()).getFirstProperty();
             String strLastName = userRecordings.get(tblPersons.getSelectionModel().getSelectedIndex()).getSecondProperty();
@@ -97,8 +97,16 @@ public class TableController implements Runnable{
 
     @FXML
     private void delete() {
-        int selectedNumberRow = tblPersons.getSelectionModel().getFocusedIndex();
-        tableRecordService.deleteRecord(userRecordings, selectedNumberRow);
+        /*int selectedNumberRow = tblPersons.getSelectionModel().getFocusedIndex();
+        tableRecordService.deleteRecord(userRecordings, selectedNumberRow);*/
+
+        if(tblPersons.getSelectionModel().isEmpty()) {
+            tblAlert.setText("Нет элементов для удаления."); // пока вопрос формулировки
+        } else {
+            int selectedNumberRow = tblPersons.getSelectionModel().getFocusedIndex();
+            tableRecordService.deleteRecord(userRecordings, selectedNumberRow);
+            tblAlert.setText("");
+        }
     }
 
     @FXML
@@ -111,6 +119,10 @@ public class TableController implements Runnable{
                             fieldLastName.getText()
                     )
             );
+
+            fieldName.clear();
+            fieldLastName.clear();
+            tblAlert.setText("");
         }
     }
 
