@@ -13,15 +13,12 @@ import testdb.model.User;
 import testdb.service.FileService;
 import testdb.service.UserService;
 
-import java.io.IOException;
+import java.io.*;
 import java.net.URL;
-import java.nio.file.CopyOption;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ResourceBundle;
-
-import static java.nio.file.StandardCopyOption.REPLACE_EXISTING;
 
 public class StartController {
 
@@ -47,13 +44,32 @@ public class StartController {
 
     @FXML
     public void initialize() {
+        User userWithBigFile;
         if (!userService.loginExists("user")) {
-            User userWithBigFile = new User("user", "123");
+            userWithBigFile = new User("user", "123");
             userService.addNewUser(userWithBigFile.getLogin(), userWithBigFile.getPass());
-            String userRecordingsFileName = userWithBigFile.getLogin() + "_" + userWithBigFile.getRegistrationTime() + ".json";
-            Path userRecordingsFilePath = FileService.createFileIfNotExists(Paths.get(System.getProperty("user.home"), ".test",  "users_data").toString(), userRecordingsFileName);
+        } else {
+            userWithBigFile = userService.findByLoginAndPassword("user", "123");
+        }
+        String userRecordingsFileName = userWithBigFile.getLogin() + "_" + userWithBigFile.getRegistrationTime() + ".json";
+
+        if (!Files.exists(Paths.get(System.getProperty("user.home"), ".test", "users_data", userRecordingsFileName))) {
+            Path userRecordingsFilePath = FileService.createFileIfNotExists(Paths.get(System.getProperty("user.home"), ".test", "users_data").toString(), userRecordingsFileName);
             try {
-                Files.copy(Paths.get("src\\main\\resources\\fillTableFile.json"), userRecordingsFilePath, REPLACE_EXISTING);
+                ClassLoader loader = Thread.currentThread().getContextClassLoader();
+                InputStream stream = loader.getResourceAsStream("fillTableFile.json");
+
+                OutputStream outStream = new FileOutputStream(userRecordingsFilePath.toFile());
+
+                byte[] buffer = new byte[8 * 1024];
+                int bytesRead;
+                while ((bytesRead = stream.read(buffer)) != -1) {
+                    outStream.write(buffer, 0, bytesRead);
+                }
+                stream.close();
+                outStream.close();
+
+//                Files.copy(Paths.get("./fillTableFile.json"), userRecordingsFilePath, REPLACE_EXISTING);
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -62,9 +78,8 @@ public class StartController {
 
     }
 
-
     @FXML
-    private void singIn(){
+    private void singIn() {
 
         String login = loginField.getText().trim();
         String password = passField.getText().trim();
@@ -87,18 +102,16 @@ public class StartController {
                 stage.setResizable(false);
                 stage.setTitle("DB Table");
                 stage.showAndWait();
-            }
-            else {
+            } else {
                 labelAlert.setText("Неправильный логин или пароль.");
             }
-        }
-        else {
+        } else {
             labelAlert.setText("Поля не могут быть пустыми.");
         }
     }
 
     @FXML
-    private void signUp(){
+    private void signUp() {
         String login = loginField.getText().trim();
         String password = passField.getText().trim();
 
@@ -106,12 +119,10 @@ public class StartController {
             if (!userService.loginExists(login)) {
                 labelAlert.setText("Регистрация завершена.");
                 userService.addNewUser(login, password);
-            }
-            else {
+            } else {
                 labelAlert.setText("Такой пользователь уже есть.");
             }
-        }
-        else {
+        } else {
             labelAlert.setText("Поля не могут быть пустыми.");
         }
     }

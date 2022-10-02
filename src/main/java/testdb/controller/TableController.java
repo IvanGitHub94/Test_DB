@@ -37,15 +37,6 @@ public class TableController implements Runnable{
     private URL location;
 
     @FXML
-    private Button btnAdd;
-
-    @FXML
-    private Button btnDel;
-
-    @FXML
-    private Button btnEdit;
-
-    @FXML
     private Label tblAlert;
 
     @FXML
@@ -65,13 +56,8 @@ public class TableController implements Runnable{
 
     @FXML
     private void editRecord() {
-        /*int selectedNumberRow = tblPersons.getSelectionModel().getFocusedIndex();
-        tblPersons.edit(selectedNumberRow, firstPropertyColumn);*/
-
-        //// 02.10
-        if(tblPersons.getSelectionModel().isEmpty() /*||
-                (fieldName.getText().isEmpty() && fieldLastName.getText().isEmpty())*/ ) {
-            tblAlert.setText("Выберите строку с данными."); // пока вопрос формулировки
+        if(tblPersons.getSelectionModel().isEmpty()) {
+            tblAlert.setText("Выберите строку с данными.");
         }else if (fieldName.getText().isEmpty() && fieldLastName.getText().isEmpty() ) {
             tblAlert.setText("Введите данные.");
         }else{
@@ -97,11 +83,8 @@ public class TableController implements Runnable{
 
     @FXML
     private void delete() {
-        /*int selectedNumberRow = tblPersons.getSelectionModel().getFocusedIndex();
-        tableRecordService.deleteRecord(userRecordings, selectedNumberRow);*/
-
         if(tblPersons.getSelectionModel().isEmpty()) {
-            tblAlert.setText("Нет элементов для удаления."); // пока вопрос формулировки
+            tblAlert.setText("Нет элементов для удаления.");
         } else {
             int selectedNumberRow = tblPersons.getSelectionModel().getFocusedIndex();
             tableRecordService.deleteRecord(userRecordings, selectedNumberRow);
@@ -130,7 +113,6 @@ public class TableController implements Runnable{
     public void run() {
         progressIndicator.setVisible(true);
 
-        ///////////////////////
         User activeUser = UserService.getActiveUser();
 
         userRecordings = createItems(tableRecordService.findAllUserRecordings(activeUser));
@@ -148,7 +130,6 @@ public class TableController implements Runnable{
         secondPropertyColumn.setOnEditCommit(event -> {
             event.getRowValue().setSecondProperty(event.getNewValue());
         });
-        ///////////////////////
 
         Platform.runLater(() -> {
             progressIndicator.setVisible(false);
@@ -159,28 +140,6 @@ public class TableController implements Runnable{
     @FXML
     void initialize() {
         new Thread(this).start();
-
-        //TODO: код в комменте перенесен в run
-        /*User activeUser = UserService.getActiveUser();
-
-        *//*progressBar.setVisible(true);
-        Thread.sleep(2000);
-        progressBar.setVisible(false);*//*
-        userRecordings = createItems(tableRecordService.findAllUserRecordings(activeUser));
-
-        tblPersons.setItems(userRecordings);
-
-        firstPropertyColumn.setCellValueFactory(new PropertyValueFactory<TableRecord, String>("firstProperty"));
-        secondPropertyColumn.setCellValueFactory(new PropertyValueFactory<TableRecord, String>("secondProperty"));
-
-        firstPropertyColumn.setCellFactory(TextFieldTableCell.forTableColumn());
-        firstPropertyColumn.setOnEditCommit(event -> {
-            event.getRowValue().setFirstProperty(event.getNewValue());
-        });
-        secondPropertyColumn.setCellFactory(TextFieldTableCell.forTableColumn());
-        secondPropertyColumn.setOnEditCommit(event -> {
-            event.getRowValue().setSecondProperty(event.getNewValue());
-        });*/
     }
 
     private ObservableList<TableRecord> createItems(List<TableRecord> records) {
@@ -191,8 +150,6 @@ public class TableController implements Runnable{
 
     public static void writeToFile() {
         User currentUser = UserService.getActiveUser();
-
-        //Добавлен if на случай, если стартовое окно будет закрыто без каких-либо действий
         if (currentUser != null) {
             String dir = createDir("/.test/users_data");
             Path fileToWrite = createFileIfNotExists(dir, currentUser.getLogin() + "_" + currentUser.getRegistrationTime() + ".json");

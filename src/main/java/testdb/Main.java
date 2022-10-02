@@ -15,10 +15,8 @@ public class Main extends Application {
 
     @Override
     public void start(Stage primaryStage) throws Exception {
-        ///////////////////////////////////////////////////////TODO: вынести создание файла и директорий из мэйна
-            FileService.createFileIfNotExists(FileService.createDir("/.test"), "/fromCode.json");
-            FileService.createDir("/.test/users_data");
-        ///////////////////////////////////////////////////////
+        FileService.createFileIfNotExists(FileService.createDir("/.test"), "/fromCode.json");
+        FileService.createDir("/.test/users_data");
 
         Parent root = FXMLLoader.load(Objects.requireNonNull(getClass().getResource("/start-window.fxml")));
         primaryStage.setTitle("TestApp");
